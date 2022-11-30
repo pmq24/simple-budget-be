@@ -87,5 +87,69 @@ class AuthControllerTest < ActionDispatch::IntegrationTest
       assert_not_nil controller.session[:user_id],
                      'User ID was not persisted in session'
     end
+
+    test 'case 400 email not provided' do
+      email = 'test@example.com'
+      password = 'abc'
+
+      post sign_up_url, params: { email: email, password: password }, as: :json
+
+      assert_response :success,
+                      'Failed to setup - User was not registered to the database'
+
+      post log_in_url, params: { password: password }, as: :json
+      assert_response 400, 'Incorrect status code'
+      assert_nil controller.session[:user_id],
+                 'User ID was persisted in session even when email was not provided'
+    end
+
+    test 'case 400 password not provided' do
+      email = 'test@example.com'
+      password = 'abc'
+
+      post sign_up_url, params: { email: email, password: password }, as: :json
+
+      assert_response :success,
+                      'Failed to setup - User was not registered to the database'
+
+      post log_in_url, params: { email: email }, as: :json
+      assert_response 400, 'Incorrect status code'
+      assert_nil controller.session[:user_id],
+                 'User ID was persisted in session even when email was not provided'
+    end
+
+    test 'case 404' do
+      email = 'test@example.com'
+      post log_in_url, params: { email: email }, as: :json
+      assert_response :not_found, 'Incorrect status code'
+      assert_nil controller.session[:user_id],
+                 'User ID was persisted in session even when email was not provided'
+    end
+
+    test 'case 400 incorrect password' do
+      email = 'test@example.com'
+      registered_password = 'abc'
+      log_in_password = 'def'
+
+      post sign_up_url,
+           params: {
+             email: email,
+             password: registered_password,
+           },
+           as: :json
+      assert_response :success,
+                      'Failed to setup - User was not registered to the database'
+
+      post log_in_url,
+           params: {
+             email: email,
+             password: log_in_password,
+           },
+           as: :json
+      assert_response :bad_request,
+                      'Logged in successfully, even with incorrect password'
+      assert_nil controller.session[:user_id],
+                 'User ID was persisted in session even when email was not provided'
+    end
   end
 end

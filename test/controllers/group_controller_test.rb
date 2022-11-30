@@ -21,7 +21,7 @@ class GroupControllerTest < ActionDispatch::IntegrationTest
   end
 
   test 'create - case 201' do
-    sign_up_and_log_in
+    user = sign_up_and_log_in
 
     name = 'monthly bills'
     kind = 'expense'
@@ -34,9 +34,17 @@ class GroupControllerTest < ActionDispatch::IntegrationTest
 
     body = JSON.parse @response.body
     data = body['data']
-    asssert_equal data.name,
-                  name,
-                  'Created group\' name doesn\'t match what was provided'
+    assert_equal data['name'],
+                 name,
+                 'Created group\' name doesn\'t match what was provided'
+
+    assert_equal data['kind'],
+                 kind,
+                 'Created group\' kind doesn\'t match what was provided'
+
+    assert_equal data['user_id'],
+                 user.id,
+                 'Created group\' user_id doesn\'t match the currently logged in user'
   end
 
   test 'create - case 400 name was not provided' do
@@ -84,7 +92,7 @@ class GroupControllerTest < ActionDispatch::IntegrationTest
                    'Group was not saved to the database'
 
     post groups_url, params: { name: name, kind: kind }, as: :json
-    assert_response :conflict, 'Group created, even the name already exists'
+    assert_response :conflict, 'Incorrect status code'
   end
 
   test 'create - case 401 not logged in' do

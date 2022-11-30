@@ -44,3 +44,7 @@ en:
               taken: 'email is taken'
             password_hash:
               blank: 'password is required'
+        group:
+          attributes:
+            name:
+              taken: 'you already have a group with this name'

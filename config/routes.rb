@@ -5,4 +5,5 @@ Rails.application.routes.draw do
   # root "articles#index"
   post '/sign-up', to: 'auth#sign_up'
   post '/log-in', to: 'auth#log_in'
+  post '/groups', to: 'group#create'
 end

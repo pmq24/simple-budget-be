@@ -115,15 +115,17 @@ class AuthControllerTest < ActionDispatch::IntegrationTest
       post log_in_url, params: { email: email }, as: :json
       assert_response 400, 'Incorrect status code'
       assert_nil controller.session[:user_id],
-                 'User ID was persisted in session even when email was not provided'
+                 'User ID was persisted in session even when password was not provided'
     end
 
-    test 'case 404' do
+    test 'case 404 not registered' do
       email = 'test@example.com'
-      post log_in_url, params: { email: email }, as: :json
+      password = 'abc'
+
+      post log_in_url, params: { email: email, password: password }, as: :json
       assert_response :not_found, 'Incorrect status code'
       assert_nil controller.session[:user_id],
-                 'User ID was persisted in session even when email was not provided'
+                 'User ID was persisted in session even when user didnt register'
     end
 
     test 'case 400 incorrect password' do
@@ -149,7 +151,7 @@ class AuthControllerTest < ActionDispatch::IntegrationTest
       assert_response :bad_request,
                       'Logged in successfully, even with incorrect password'
       assert_nil controller.session[:user_id],
-                 'User ID was persisted in session even when email was not provided'
+                 'User ID was persisted in session even when password was wrong'
     end
   end
 end

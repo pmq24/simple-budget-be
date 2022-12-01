@@ -85,4 +85,32 @@ class AuthController < ApplicationController
              'message' => "logged in successfully, welcome back #{email}!",
            }
   end
+
+  def me
+    user_id_in_session = session['user_id']
+
+    if user_id_in_session.nil?
+      render status: :unauthorized,
+             json: {
+               'message' => 'you are not logged in',
+             }
+      return
+    end
+
+    user = User.find_by_id(user_id_in_session)
+
+    if user.nil?
+      render status: :unauthorized,
+             json: {
+               'message' => 'cannot identify you, please log in',
+             }
+      return
+    end
+
+    render status: :ok,
+           json: {
+             'message' => "you are logged in as #{user.email}",
+             'data' => user,
+           }
+  end
 end

@@ -154,4 +154,31 @@ class AuthControllerTest < ActionDispatch::IntegrationTest
                  'User ID was persisted in session even when password was wrong'
     end
   end
+
+  class MeTest < ActionDispatch::IntegrationTest
+    test 'case 200' do
+      email = 'test@example.com'
+      password = 'abc'
+
+      post sign_up_url, params: { email: email, password: password }, as: :json
+
+      assert_response :success,
+                      'Failed to setup - User was not registered to the database'
+
+      post log_in_url, params: { email: email, password: password }, as: :json
+      assert_response :success, 'Failed to setup - Failed to log in'
+
+      get me_url
+      assert_response :ok, 'Incorrect status code'
+
+      body = JSON.parse @response.body
+      data = body['data']
+      assert_equal data['email'], email, 'email was mapped incorrectly'
+    end
+
+    test 'case 401' do
+      get me_url
+      assert_response :unauthorized, 'Incorrect status code'
+    end
+  end
 end

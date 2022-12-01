@@ -30,6 +30,16 @@ class TransactionTest < ActiveSupport::TestCase
                'Transaction created, even with negative amount'
   end
 
+  test 'should not save transaction when amount is a string' do
+    transaction =
+      Transaction.new amount: 'not a number',
+                      time: DateTime.now,
+                      user_id: @user.id,
+                      group_id: @group.id
+    assert_not transaction.save,
+               'Transaction created, even with a string amount'
+  end
+
   test 'should not save transaction when user_id is missing' do
     transaction =
       Transaction.new amount: 1000, time: DateTime.now, group_id: @group.id

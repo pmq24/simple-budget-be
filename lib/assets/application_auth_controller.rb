@@ -11,3 +11,5 @@ class ApplicationAuthController < ApplicationController
     return User.find_by_id session[:user_id]
   end
 end
+
+UNAUTHORIZED_RESPONSE_BODY = { message: 'You must log in' }

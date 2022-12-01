@@ -1,7 +1,13 @@
-class TransactionController < ApplicationController
+require_relative '../../lib/assets/application_auth_controller.rb'
+
+class TransactionController < ApplicationAuthController
   def create
-    user = require_auth
-    body = parse_request_body
+    user = get_logged_in_user
+    if user.nil?
+      return render status: :unauthorized, json: UNAUTHORIZED_RESPONSE_BODY
+    end
+
+    body = JSON.parse request.body.read
 
     transaction =
       Transaction.new amount: body['amount'],
@@ -9,57 +15,25 @@ class TransactionController < ApplicationController
                       group_id: body['group_id'],
                       user_id: user.id
     if transaction.invalid?
-      render_bad_request_response transaction.errors
+      render status: :bad_request,
+             json: {
+               message: 'the data provivded is invalid',
+               data: transaction.errors,
+             }
       return
     end
 
-    transaction.save
+    transaction.save!
 
-    render_success_response transaction
+    render status: :created, json: transaction
   end
 
   def get_all
-    user = require_auth
+    user = get_logged_in_user
+    if user.nil?
+      return render status: :unauthorized, json: UNAUTHORIZED_RESPONSE_BODY
+    end
 
     render status: :ok, json: Transaction.where(user_id: user.id)
-  end
-
-  # TODO: as this method is used in other controllers as well, it should be refactored to make it more reusable
-  def require_auth
-    if not session.key? 'user_id'
-      render status: :unauthorized, json: { 'message' => 'You have to log in' }
-      return
-    end
-
-    user_id = session['user_id']
-    user = User.find(user_id)
-
-    if user.nil?
-      render status: :unauthorized, json: { 'message' => 'You have to log in' }
-      return
-    end
-
-    return user
-  end
-
-  def parse_request_body
-    return JSON.parse request.body.read
-  end
-
-  def render_bad_request_response(errors)
-    render status: :bad_request,
-           json: {
-             'message' =>
-               'the provided data is invalid, refer to `errors` for details',
-             'errors' => errors,
-           }
-  end
-
-  def render_success_response(transaction)
-    render status: :created,
-           json: {
-             'message' => 'the transaction was successfully created',
-             'data' => transaction.to_json,
-           }
   end
 end

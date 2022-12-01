@@ -92,18 +92,16 @@ class AuthController < ApplicationAuthController
     user = get_logged_in_user
 
     if user.nil?
-      return(
-        render status: :unauthorized,
-               json: {
-                 'message' => 'you are not logged in',
-               }
-      )
+      return render status: :unauthorized, json: UNAUTHORIZED_RESPONSE_BODY
     end
+
+    returned_user = user.attributes
+    returned_user.delete(:password_hash)
 
     render status: :ok,
            json: {
-             'message' => "you are logged in as #{user.email}",
-             'data' => user,
+             message: 'retrieved your profile successfully',
+             data: returned_user,
            }
   end
 end

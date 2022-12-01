@@ -48,6 +48,7 @@ class GroupController < ApplicationController
            }
   end
 
+  # TODO: as this method is used in other controllers as well, it should be refactored to make it more reusable
   def require_auth
     if not session.key? :user_id
       render status: :unauthorized, json: { 'message' => 'You have to log in' }

@@ -26,6 +26,26 @@ class TransactionControllerTest < ActionDispatch::IntegrationTest
     assert_response :bad_request, 'Incorrect status code'
   end
 
+  test 'get all - case 200' do
+    sign_up_and_log_in
+    (1..5).each do |number|
+      post_data_to_create_transaction(
+        {
+          amount: number,
+          time: DateTime.now,
+          user_id: @user.id,
+          group_id: @group.id,
+        },
+      )
+    end
+
+    get transactions_url
+
+    assert_response :success
+
+    assert_equal Transaction.where(user_id: @user.id).size, 5
+  end
+
   def sign_up_and_log_in
     email = 'test@example.com'
     password = 'password'

@@ -18,6 +18,12 @@ class TransactionController < ApplicationController
     render_success_response transaction
   end
 
+  def get_all
+    user = require_auth
+
+    render status: :ok, json: Transaction.where(user_id: user.id)
+  end
+
   # TODO: as this method is used in other controllers as well, it should be refactored to make it more reusable
   def require_auth
     if not session.key? 'user_id'

@@ -1,7 +1,9 @@
 require 'digest'
 require 'json'
 
-class AuthController < ApplicationController
+require_relative '../../lib/assets/application_auth_controller.rb'
+
+class AuthController < ApplicationAuthController
   protect_from_forgery with: :null_session
 
   def sign_up
@@ -78,7 +80,7 @@ class AuthController < ApplicationController
       return
     end
 
-    session[:user_id] = user.id
+    persist_user user
 
     render status: :ok,
            json: {
@@ -87,24 +89,15 @@ class AuthController < ApplicationController
   end
 
   def me
-    user_id_in_session = session['user_id']
-
-    if user_id_in_session.nil?
-      render status: :unauthorized,
-             json: {
-               'message' => 'you are not logged in',
-             }
-      return
-    end
-
-    user = User.find_by_id(user_id_in_session)
+    user = get_logged_in_user
 
     if user.nil?
-      render status: :unauthorized,
-             json: {
-               'message' => 'cannot identify you, please log in',
-             }
-      return
+      return(
+        render status: :unauthorized,
+               json: {
+                 'message' => 'you are not logged in',
+               }
+      )
     end
 
     render status: :ok,

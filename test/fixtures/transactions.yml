@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  amount: 1
+  note: MyString
+  time: 2022-12-01 15:56:59
+  user: one
+  group: one
+
+two:
+  amount: 1
+  note: MyString
+  time: 2022-12-01 15:56:59
+  user: two
+  group: two

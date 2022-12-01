@@ -9,4 +9,7 @@ Rails.application.routes.draw do
 
   post '/groups', to: 'group#create'
   get '/groups', to: 'group#get_all'
+
+  post '/transactions', to: 'transaction#create'
+  get '/transactions', to: 'transaction#get_all'
 end

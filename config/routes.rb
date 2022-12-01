@@ -8,4 +8,5 @@ Rails.application.routes.draw do
   get '/me', to: 'auth#me'
 
   post '/groups', to: 'group#create'
+  get '/groups', to: 'group#get_all'
 end

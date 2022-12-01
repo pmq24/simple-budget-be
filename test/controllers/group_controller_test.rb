@@ -99,4 +99,22 @@ class GroupControllerTest < ActionDispatch::IntegrationTest
     post groups_url, as: :json
     assert_response :unauthorized, 'Incorrect status code'
   end
+
+  test 'get all - case 200' do
+    user = sign_up_and_log_in
+
+    ('a'..'c').each do |name|
+      post groups_url, params: { name: name, kind: 'expense' }, as: :json
+    end
+
+    assert_equal Group.where(user_id: user.id).size,
+                 3,
+                 'Failed to setup - Failed to create 3 groups'
+
+    get groups_url
+    assert_response :success, 'Incorrect status code'
+    body = JSON.parse @response.body
+    data = body['data']
+    assert_equal data.size, 3, 'Failed to get all 3 created groups'
+  end
 end

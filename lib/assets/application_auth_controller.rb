@@ -4,11 +4,9 @@ class ApplicationAuthController < ApplicationController
   end
 
   def get_logged_in_user
-    if (session.key?(:user_id).nil?) or
-         (User.find_by_id(session[:user_id]).nil?)
-      return nil
-    end
-    return User.find_by_id session[:user_id]
+    return nil if not session.key? :user_id
+
+    return User.find_by id: session[:user_id]
   end
 end
 

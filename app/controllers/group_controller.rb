@@ -1,8 +1,11 @@
 require_relative '../../lib/assets/application_auth_controller.rb'
 
 class GroupController < ApplicationAuthController
+  protect_from_forgery with: :null_session
+
   def create
     user = get_logged_in_user
+
     if user.nil?
       return render status: :unauthorized, json: UNAUTHORIZED_RESPONSE_BODY
     end

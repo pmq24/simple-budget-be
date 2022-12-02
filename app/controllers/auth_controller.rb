@@ -80,7 +80,7 @@ class AuthController < ApplicationAuthController
       return
     end
 
-    persist_user user
+    session[:user_id] = user.id
 
     render status: :ok,
            json: {
